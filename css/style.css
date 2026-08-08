@@ -1,0 +1,396 @@
+/* ========================================== */
+/* 1. BASE STYLES & DYNAMIC VARIABLES         */
+/* ========================================== */
+:root {
+    --ui-panel-bg: rgba(15, 23, 42, 0.55);
+    --ui-border: rgba(255, 255, 255, 0.1);
+    --ui-text: #e2e8f0;
+    --ui-accent: #38bdf8;
+    --ui-blur: blur(16px);
+}
+
+body {
+    margin: 0; padding: 0;
+    background-color: #020202;
+    color: var(--ui-text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden !important; 
+    height: 100vh;
+    width: 100vw;
+}
+
+/* ========================================== */
+/* DYNAMIC SCROLLBARS                         */
+/* ========================================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--ui-border);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--ui-accent);
+}
+
+/* ========================================== */
+/* 2. APP LAYOUT & TOP BAR                    */
+/* ========================================== */
+.app-container { 
+    position: relative; 
+    z-index: 10; 
+    max-width: 1200px; 
+    height: 100vh;
+    margin: 0 auto; 
+    padding: 15px 20px; 
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* ========================================== */
+/* MINIMAL FLAT HEADER (ZERO GLASS)           */
+/* ========================================== */
+.minimal-header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    gap: 8px; /* Extremely tight vertical spacing */
+}
+
+.header-row-top, .header-row-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.app-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--ui-text);
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+/* Force Weather to be completely flat and slightly smaller */
+.weather-hero-inline {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: transparent !important;
+    border: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+}
+
+.wx-hero-temp {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 2.2rem; /* Scaled down to compress height */
+    font-weight: 800;
+    line-height: 1;
+    color: #f8fafc;
+    margin: 0;
+}
+.wx-hero-details { display: flex; flex-direction: column; justify-content: center; }
+.wx-hero-location { font-size: 0.85rem; font-weight: bold; color: #f1f5f9; display: flex; align-items: center; gap: 5px; }
+.wx-hero-desc { font-size: 0.8rem; margin: 0; color: var(--ui-accent); }
+
+/* Force Stats to be completely flat */
+.header-right-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.user-stats-block {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.user-stats-block p {
+    margin: 0 0 4px 0;
+    font-size: 0.85rem;
+}
+.stats-panel-inner {
+    display: flex;
+    gap: 12px;
+    padding: 0;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+.text-green { color: #4ade80; font-weight: bold; }
+.text-white { color: #e2e8f0; font-weight: bold; }
+.text-amber { color: #fbbf24; font-weight: bold; }
+
+.logout-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    height: fit-content;
+}
+
+.toggle-container { display: flex; align-items: center; gap: 10px; }
+.toggle-label { font-size: 0.85rem; color: var(--ui-accent); font-weight: bold; letter-spacing: 1px; }
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.1); border: 1px solid var(--ui-accent); transition: .4s; border-radius: 24px; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: var(--ui-accent); transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: rgba(74, 222, 128, 0.2); border-color: #4ade80; }
+input:checked + .slider:before { transform: translateX(20px); background-color: #4ade80; }
+
+/* In-line Weather Widget (Replaces floating version) */
+.weather-hero-inline {
+    background: var(--ui-panel-bg);
+    backdrop-filter: var(--ui-blur);
+    -webkit-backdrop-filter: var(--ui-blur);
+    border: 1px solid var(--ui-border);
+    padding: 12px 18px;
+    border-radius: 10px;
+    min-width: 220px;
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.wx-hero-location { display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: bold; color: #f1f5f9; }
+.wx-hero-temp { font-family: 'Share Tech Mono', monospace; font-size: 3.5rem; font-weight: 800; line-height: 1; color: #f8fafc; margin: 4px 0; }
+.wx-hero-desc { font-size: 0.85rem; color: var(--ui-accent); margin-bottom: 4px; }
+.wx-hero-hilo, .wx-hero-meta { font-size: 0.8rem; color: #94a3b8; display: flex; flex-direction: column; gap: 2px; }
+
+/* User Stats & Logout Restored */
+.user-stats { text-align: right; font-size: 0.9rem; }
+.stats-panel-inner {
+    font-family: 'Share Tech Mono', monospace; 
+    color: #94a3b8; 
+    font-size: 0.85rem; 
+    line-height: 1.5; 
+    background: var(--ui-panel-bg); 
+    backdrop-filter: var(--ui-blur);
+    padding: 10px 14px; 
+    border-radius: 8px; 
+    border: 1px solid var(--ui-border);
+    border-left: 3px solid var(--ui-accent);
+}
+.logout-btn { 
+    background: rgba(239, 68, 68, 0.1); 
+    color: #ef4444; 
+    border: 1px solid rgba(239, 68, 68, 0.4); 
+    padding: 6px 15px; 
+    border-radius: 6px; 
+    cursor: pointer;
+    transition: all 0.2s; 
+}
+.logout-btn:hover { background: rgba(239, 68, 68, 0.3); color: #fff; }
+
+/* ========================================== */
+/* 3. MAIN CONTENT STACK & ANALYTICS          */
+/* ========================================== */
+.main-content-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    flex: 1;
+    overflow: hidden;
+}
+
+.input-section { width: 100%; text-align: center; flex-shrink: 0; }
+.input-section h2 { font-size: 1.25rem; margin: 0 0 10px 0; color: var(--ui-text); }
+
+textarea {
+    width: 100%; height: 75px;
+    background: var(--ui-panel-bg); 
+    backdrop-filter: var(--ui-blur);
+    border: 1px solid var(--ui-border); 
+    border-radius: 8px; color: var(--ui-text); 
+    padding: 10px 14px; font-family: monospace; font-size: 0.9rem; 
+    resize: none; margin-bottom: 10px; outline: none; box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+textarea:focus { border-color: var(--ui-accent); }
+
+.action-btn { 
+    background: var(--ui-accent); color: #0f172a; border: none; font-weight: bold; 
+    padding: 8px 24px; font-size: 0.95rem; border-radius: 6px; cursor: pointer; transition: transform 0.2s;
+}
+.action-btn:hover { transform: translateY(-1px); }
+
+/* History & Analytics Tables (Side-by-Side) */
+.analytics-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    width: 100%;
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+}
+
+.analytics-card {
+    box-sizing: border-box;
+    background: var(--ui-panel-bg);
+    backdrop-filter: var(--ui-blur);
+    -webkit-backdrop-filter: var(--ui-blur);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Flex ratios: History takes ~65% of the space, Top Threats takes ~35% */
+.main-history-card { flex: 1.8; min-width: 0; }
+.top-threats-card { flex: 1.1; min-width: 0; }
+
+/* Responsive break for small screens/windows */
+@media (max-width: 950px) {
+    .analytics-wrapper {
+        flex-direction: column;
+    }
+}
+
+.analytics-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--ui-border); flex-shrink: 0;
+}
+.analytics-title { font-size: 0.9rem; font-weight: bold; color: var(--ui-text); display: flex; align-items: center; gap: 6px; }
+
+.table-action-btn {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid var(--ui-border); color: var(--ui-text);
+    padding: 3px 10px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+}
+.table-action-btn:hover { background: var(--ui-accent); color: #0f172a; }
+
+.table-container { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+
+.history-table-header {
+    display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 0.8fr;
+    font-size: 0.75rem; font-weight: bold; color: #94a3b8; text-transform: uppercase;
+    padding: 6px 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); flex-shrink: 0;
+}
+.top-table-header {
+    display: grid; grid-template-columns: 3fr 1fr;
+    font-size: 0.75rem; font-weight: bold; color: #94a3b8; text-transform: uppercase;
+    padding: 6px 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); flex-shrink: 0;
+}
+
+.history-table-body { flex: 1; overflow-y: auto; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; }
+
+.history-row, .top-row { align-items: center; padding: 6px 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); transition: background 0.2s; }
+.history-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1fr 0.8fr; }
+.top-row { display: grid; grid-template-columns: 3fr 1fr; }
+.history-row:hover, .top-row:hover { background: rgba(255, 255, 255, 0.05); }
+
+.cell-ioc { color: #f8fafc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cell-user { color: #cbd5e1; }
+.cell-time { color: #94a3b8; font-size: 0.75rem; }
+
+.verdict-tag { padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: bold; width: fit-content; }
+.verdict-malicious { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+.verdict-safe { background: rgba(74, 222, 128, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); }
+.verdict-suspicious { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); }
+
+.badge-count { background: var(--ui-accent); color: #0f172a; font-weight: bold; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; justify-self: end; }
+.row-copy-btn { background: transparent; border: 1px solid var(--ui-border); color: var(--ui-text); padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; transition: background 0.2s; }
+.row-copy-btn:hover { background: rgba(255, 255, 255, 0.15); }
+.table-loading { padding: 15px; text-align: center; color: #64748b; font-style: italic; font-size: 0.85rem; }
+
+/* ========================================== */
+/* 4. TACTICAL MODE OVERRIDES (POWER SAVE)    */
+/* ========================================== */
+body.power-save-mode {
+    --ui-panel-bg: rgba(10, 15, 20, 0.9) !important;
+    --ui-blur: none !important;
+    --ui-border: #333 !important;
+    --ui-accent: #4ade80 !important;
+}
+
+body.power-save-mode * {
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    animation: none !important;
+}
+
+body.power-save-mode .weather-bg-canvas { display: none !important; }
+body.power-save-mode .weather-hero-inline { display: none !important; }
+body.power-save-mode .toggle-label { color: #4ade80 !important; }
+
+/* ==========================================
+   DEVELOPER WATERMARK ANIMATION
+   ========================================== */
+@keyframes cyberPulse {
+    0% { 
+        opacity: 0.3; 
+        transform: translateY(0px); 
+    }
+    50% { 
+        opacity: 0.8; 
+        text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); 
+        transform: translateY(-2px); 
+    }
+    100% { 
+        opacity: 0.3; 
+        transform: translateY(0px); 
+    }
+}
+
+.dev-watermark {
+    position: fixed;
+    bottom: 15px;
+    right: 20px;
+    font-family: 'Share Tech Mono', 'Segoe UI', monospace;
+    font-size: 0.75rem;
+    color: #94a3b8; 
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    z-index: 9999; 
+    pointer-events: none; 
+    animation: cyberPulse 4s infinite ease-in-out;
+}
+
+.dev-watermark .highlight {
+    color: var(--ui-accent); 
+    font-weight: bold;
+}
+
+/* ========================================== */
+/* 5. PRESERVED ORIGINAL OVERLAYS             */
+/* ========================================== */
+.weather-bg-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; display: block; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 2, 2, 0.85); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.modal-box { background: rgba(15, 23, 42, 0.95); border: 1px solid #ef4444; padding: 30px; border-radius: 8px; max-width: 400px; text-align: center; box-shadow: 0 0 40px rgba(239, 68, 68, 0.3); }
+.btn-recheck { background: transparent; color: #fbbf24; border: 1px solid #fbbf24; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-family: monospace; transition: 0.2s; }
+.btn-recheck:hover { background: #fbbf24; color: #020202; }
+pre#details-content { background: #0f172a; padding: 15px; border-radius: 4px; overflow-x: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.85rem; line-height: 1.5; color: #e2e8f0; border: 1px solid rgba(56, 189, 248, 0.2); }
+.json-key { color: #38bdf8; font-weight: bold; } .json-string { color: #4ade80; } .json-number { color: #fbbf24; } .json-boolean { color: #ef4444; } .json-null { color: #94a3b8; font-style: italic; }
+#results-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; padding: 30px; box-sizing: border-box; }
+.results-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+.btn-secondary { background: #64748b; color: white; border: none; padding: 8px 24px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+.btn-outline { background: transparent; border: 1px solid var(--ui-accent); color: var(--ui-accent); padding: 8px 16px; border-radius: 4px; margin-right: 10px; cursor: pointer;}
+.panels-container { display: flex; gap: 20px; height: calc(100vh - 100px); }
+.panel { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--ui-border); border-radius: 8px; padding: 20px; overflow-y: auto; flex: 1; }
+.panel-title { border-bottom: 1px solid var(--ui-border); padding-bottom: 10px; margin-top: 0; color: var(--ui-accent); }
+.panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--ui-border); padding-bottom: 10px; margin-bottom: 15px; }
+.grep-input { background: rgba(15,23,42,0.8); color: white; border: 1px solid var(--ui-accent); border-radius: 4px; padding: 5px 10px; outline: none; }
+.login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 1000; display: flex; justify-content: center; align-items: center; }
+.login-panel { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--ui-border); padding: 40px; border-radius: 8px; width: 100%; max-width: 400px; text-align: center; }
+.login-input { width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--ui-border); color: white; border-radius: 4px; box-sizing: border-box; outline: none; }
+.login-input:focus { border-color: var(--ui-accent); }

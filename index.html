@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TCS SOC - Unified Threat Intel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="cursor-glow"></div>
+
+    <div id="login-gateway" class="login-overlay">
+        <div class="login-panel">
+            <h2 class="neon-flicker" style="font-size: 2rem; margin-bottom: 30px;">SOC GATEWAY</h2>
+            <input type="email" id="login-email" placeholder="Analyst Email" class="login-input">
+            <input type="password" id="login-password" placeholder="Password" class="login-input">
+            <p id="login-error" class="error-text" style="display: none; font-size: 0.85rem;"></p>
+            <button id="btn-login" class="action-btn" style="width: 100%; margin-top: 10px;">Authenticate</button>
+        </div>
+    </div>
+
+    <div id="main-dashboard" style="display: none;">
+
+        <canvas id="weather-bg-canvas" class="weather-bg-canvas"></canvas>
+
+        <div class="app-container">
+            
+             <!-- MINIMAL FLAT HEADER -->
+            <div class="minimal-header">
+                
+                <!-- Top Row: Title & Toggle -->
+                <div class="header-row-top">
+                    <h1 class="app-title">Unified IOC Enrichment Application</h1>
+                    <div class="toggle-container">
+                        <label class="switch">
+                            <input type="checkbox" id="power-save-toggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">⚡ NORMAL MODE</span>
+                    </div>
+                </div>
+                
+                <!-- Bottom Row: Weather & Stats -->
+                <div class="header-row-bottom">
+                    
+                    <!-- Left: Flat Weather -->
+                    <div id="weather-hero" class="weather-hero-inline">
+                        <div id="weather-temp" class="wx-hero-temp">--°</div>
+                        <div class="wx-hero-details">
+                            <div class="wx-hero-location"><span class="wx-pin">📍</span> <span id="weather-place"></span></div>
+                            <div id="weather-desc" class="wx-hero-desc"></div>
+                            <div id="weather-hilo" class="wx-hero-hilo" style="display: none;"></div>
+                            <div id="weather-meta" class="wx-hero-meta" style="display: none;"></div>
+                            <div id="weather-error" class="wx-hero-error" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Flat Stats & Logout -->
+                    <div class="header-right-group">
+                        <div class="user-stats-block">
+                            <p id="user-greeting" class="highlight">Welcome, Analyst!</p>
+                            <div id="stats-panel" class="stats-panel-inner">
+                                <div>Quota: <span id="daily-checks" class="text-green">0</span>/30</div>
+                                <div>Total: <span id="total-checks" class="text-white">0</span></div>
+                                <div>Global: <span id="global-checks" class="text-amber">0</span></div>
+                            </div>
+                        </div>
+                        <button id="btn-logout" class="logout-btn">Logout</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ZERO-SCROLL SINGLE PAGE STACK -->
+            <div class="main-content-stack">
+                
+                <!-- 1. TOP: IOC Input (Title removed to save height) -->
+                <div class="input-section">
+                    <textarea id="ioc-input" placeholder="Enter IPs, Domains, URLs, Hashes (MD5/SHA256), or Emails (one per line)..."></textarea>
+                    <p id="search-error" class="error-text" style="display: none;"></p>
+                    <button id="btn-analyze" class="action-btn">Analyze IOCs</button>
+                </div>
+
+                <!-- 2. BOTTOM: Analytics Side-by-Side -->
+            <div class="analytics-wrapper">
+            
+            <!-- Recent Investigations (Last 10) -->
+            <div class="analytics-card main-history-card">
+                <div class="analytics-header">
+                    <div class="analytics-title">
+                        <span class="title-icon">🕒</span> Recent Investigations (Last 10)
+                    </div>
+                    <div class="analytics-actions">
+                        <button id="btn-copy-recent-tsv" class="table-action-btn" title="Copy table as TSV">📋 Copy Table (TSV)</button>
+                        <button id="btn-refresh-recent" class="table-action-btn" title="Refresh Table">🔄 Refresh</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div class="history-table-header">
+                        <div>IOC Name</div>
+                        <div>Verdict</div>
+                        <div>Analyst</div>
+                        <div>Time</div>
+                        <div>Action</div>
+                    </div>
+                    <div id="recent-searches-list" class="history-table-body">
+                        <div class="table-loading">Loading cached searches...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Searches -->
+            <div class="analytics-card top-threats-card">
+                <div class="analytics-header">
+                    <div class="analytics-title">
+                        <span class="title-icon">🔥</span> Top Searches
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div class="top-table-header">
+                        <div>IOC Name</div>
+                        <div style="text-align: right;">Search Count</div>
+                    </div>
+                    <div id="top-iocs-list" class="history-table-body">
+                        <div class="table-loading">Calculating trends...</div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+            </div>
+        </div>
+
+        <!-- Results Overlay -->
+        <div id="results-overlay">
+            <div class="results-header">
+                <button id="btn-new-search" class="btn-secondary">← New Search</button>
+                <div>
+                    <button id="btn-copy-summary" class="btn-outline">Copy Summary</button>
+                    <button id="btn-download-txt" class="btn-outline highlight-border">Download .TXT</button>
+                </div>
+            </div>
+            <div class="panels-container">
+                <div class="panel">
+                    <h3 class="panel-title">Executive Summary</h3>
+                    <div id="summary-content"></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title no-border">Detailed Telemetry</h3>
+                        <input type="text" id="telemetry-search" placeholder="Grep logs..." class="grep-input">
+                    </div>
+                    <pre id="details-content"></pre>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- Recheck Modal -->
+    <div id="recheck-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <h3 style="color: #ef4444; margin-top: 0;">/// QUOTA WARNING ///</h3>
+            <p>This IOC was recently analyzed. Forcing a live check will consume active API quotas across all providers.</p>
+            <p style="color: #fbbf24; font-size: 0.9rem;">Are you sure you want to proceed?</p>
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <button id="btn-cancel-recheck" class="btn-outline">CANCEL</button>
+                <button id="btn-confirm-recheck" class="action-btn" style="background: #ef4444; box-shadow: 0 0 15px rgba(239,68,68,0.4);">FORCE CHECK</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="js/db-cache.js"></script>
+    <script type="module" src="js/ioc-parser.js"></script>
+    <script type="module" src="js/ui-controller.js"></script>
+    <script type="module" src="js/weather-widget.js"></script>
+    <script type="module" src="js/history-controller.js"></script>
+    
+    <div class="dev-watermark">
+        Designed and Developed by <span class="highlight">Sivanjaneyulu Tungala</span>
+    </div>
+</body>
+</html>
