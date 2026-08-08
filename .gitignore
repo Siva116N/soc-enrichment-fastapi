@@ -2,3 +2,7 @@
 ".venv/" 
 "*.json"  
 ".env" 
+"node_modules/" 
+".venv/" 
+"*.json"  
+".env" 
